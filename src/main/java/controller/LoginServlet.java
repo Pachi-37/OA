@@ -30,8 +30,11 @@ public class LoginServlet extends HttpServlet {
         // 调用业务逻辑
         try {
             User user = userService.checkLogin(username, password);
+            HttpSession session = request.getSession();
+            session.setAttribute("login_user", user);
             result.put("code", "0");
             result.put("message", "success");
+            result.put("redirect_url", "/index");
         } catch (BusinessException e) {
             logger.error(e.getMessage(), e);
             result.put("code", e.getCode());
@@ -48,6 +51,6 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        doGet(request, response);
     }
 }

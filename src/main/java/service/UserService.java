@@ -1,12 +1,17 @@
 package service;
 
+import dao.RbacDao;
 import dao.UserDao;
+import entity.Node;
 import entity.User;
 import service.exception.BusinessException;
+
+import java.util.List;
 
 public class UserService {
 
     private UserDao userDao = new UserDao();
+    private RbacDao rbacDao = new RbacDao();
 
     public User checkLogin(String username, String password) {
 
@@ -22,5 +27,9 @@ public class UserService {
         } else {
             throw new BusinessException("L002", "密码错误");
         }
+    }
+
+    public List<Node> selectNodeByUserId(Long userId) {
+        return rbacDao.selectNodeByUserId(userId);
     }
 }

@@ -44,7 +44,22 @@
 <script src="/resources/layui/layui.js"></script>
 <script>
     layui.form.on("submit(login)", function (data) {
-        console.log( data);
+        console.log(data);
+
+        layui.$.ajax({
+            url: "/check_login",
+            data: data.field,
+            type: "post",
+            dataType: "json",
+            success: function (json) {
+                if (json.code == "0") {
+                    window.location.href = json.redirect_url;
+                } else {
+                    layui.layer.msg(json.message);
+                }
+            }
+        })
+
         return false; // submit 提交事件返回 true 则表单提交，false 阻止表单提交
     })
 </script>

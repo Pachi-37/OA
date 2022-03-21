@@ -1,15 +1,22 @@
 package service;
 
 import entity.User;
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class UserServiceTest extends TestCase {
+import static org.junit.Assert.*;
 
-    private UserService userService = new UserService();
+public class UserServiceTest {
 
-    public void testCheckLogin() {
+    UserService userService = new UserService();
+
+    @Test
+    public void checkLogin() {
         User user = userService.checkLogin("m8", "test");
+        System.out.println(user);
+    }
 
-        System.out.println(user.getPassword());
+    @Test
+    public void selectNodeByUserId() {
+        userService.selectNodeByUserId(21L).stream().forEach(s -> System.out.println(s));
     }
 }
