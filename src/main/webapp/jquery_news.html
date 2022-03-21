@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script type="text/javascript" src="resources/jquery-3.6.0.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            "url": "/NewsListServlet",
+            "type": "get",
+            "data": "type=type",
+            "dataType": "json",
+            "success": function (json) {
+                console.log(json);
+
+                for (let i = 0; i < json.length; i++) {
+                    $("#container").append("<h1>" + json[i].title + "</h1>");
+                    $("#container").append("<h2>" + json[i].content + "</h2>");
+                }
+            },
+            "error":function (xmlhttp, errorText) {
+                console.log(xmlhttp);
+                console.log(errorText);
+            }
+        })
+    })
+</script>
+<body>
+
+
+<div id="container">
+
+</div>
+</body>
+</html>

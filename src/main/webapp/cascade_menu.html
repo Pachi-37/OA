@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script type="text/javascript" src="resources/jquery-3.6.0.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            "url": "/ChannelServlet",
+            "data": {"level": "1"},
+            "type": "get",
+            "dataType": "json",
+            "success": function (json) {
+                console.log(json);
+
+                for (let i = 0; i < json.length; i++) {
+                    $("#lv1").append("<option value=" + json[i].code + ">" + json[i].name + "</option>");
+                }
+            }
+        })
+    })
+
+    $(function () {
+        $("#lv1").on("change", function () {
+            var parent = $(this).val();
+
+            $.ajax({
+                "url": "/ChannelServlet",
+                "data": {"level": "2", "parent": parent},
+                "type": "get",
+                "dataType": "json",
+                "success": function (json) {
+                    console.log(json);
+                    $("#lv2>option").remove();
+                    for (let i = 0; i < json.length; i++) {
+                        var data = json[i];
+
+                        $("#lv2").append("<option value = " + data.code + ">" + data.name + "</option>")
+                    }
+                }
+            })
+        })
+    })
+</script>
+<body>
+<select id="lv1" style="width: 200px;height: 30px">
+    <option selected="selected">请选择</option>
+</select>
+<select id="lv2" style="width: 200px;height: 30px">
+
+</select>
+</body>
+</html>

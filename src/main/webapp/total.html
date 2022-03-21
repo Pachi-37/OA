@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script type="text/javascript" src="resources/echarts.min.js"></script>
+<script type="text/javascript" src="resources/jquery-3.6.0.js"></script>
+<body>
+<div id="main" style="width: 600px;height: 400px"></div>
+<script type="text/javascript">
+
+    $.ajax({
+        url: "/RequestTotalServlet",
+        type: "get",
+        data: "json",
+        success: function (json) {
+            var myChart = echarts.init(document.getElementById("main"));
+
+            var option = {
+                title: {
+                    text: '请求流量访问统计'
+                },
+                tooltip: {},
+                legend: {
+                    data: ['访问量']
+                },
+                xAxis: {
+                    data: json.timeList
+                },
+                yAxis: {},
+                series: [{
+                    name: '访问量',
+                    type: 'line',
+                    data: json.valueList
+                }]
+            };
+
+            myChart.setOption(option);
+        }
+
+    })
+
+
+</script>
+</body>
+</html>

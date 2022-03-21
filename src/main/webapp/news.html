@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="container">
+
+</div>
+
+<script type="text/javascript">
+    var xmlhttp;
+    // 创建 XmlHttRequest 对象
+    if (window.XMLHttpRequest) {
+        xmlhttp = new XMLHttpRequest();
+    } else {
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    // 发送 Ajax 请求
+    xmlhttp.open("Get", "NewsListServlet", true);
+    xmlhttp.send()
+    // 处理服务器响应
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            var text = xmlhttp.responseText;
+            console.log(text);
+            var json = JSON.parse(text);
+
+            var html = "";
+            for (let i = 0; i < json.length; i++) {
+                var news = json[i];
+                html = html + "<h1>" + news.title + "</h1>";
+                html = html + "<h2>" + news.data + "&amp;" + news.source + "</h2>";
+                html = html + "<p>" + news.content + "</p>";
+                html += "<hr/>"
+            }
+
+            document.getElementById("container").innerHTML = html;
+        }
+    }
+</script>
+
+</body>
+</html>
