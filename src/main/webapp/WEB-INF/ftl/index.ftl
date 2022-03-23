@@ -9,20 +9,20 @@
 <body class="layui-layout-body">
 <div class="layui-layout layui-layout-admin">
     <div class="layui-header">
-        <div class="layui-logo" style="font-size: large;">OA系统</div>
+        <div class="layui-logo" style="font-size:18px">OA系统</div>
 
-        <ul class="layui-nav layui-nav-right">
-            <li class="layui-nav-item" style="margin-left: 90%">
-                <a href="javascript:void (0)">
-                    <span class="layui-icon layui-icon-user" style="font-size: large;"></span>
-                    姓名
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="javascript:void(0)">
+                    <span class="layui-icon layui-icon-user" style="font-size: 20px">
+                    </span>
+                    ${current_employee.name} | ${current_department.departmentName} | ${current_employee.title}
                 </a>
             </li>
-            <li class="layui-nav-item">
-                <a herf="#">注销</a>
-            </li>
+            <li class="layui-nav-item"><a href="/logout">注销</a></li>
         </ul>
     </div>
+
 
     <div class="layui-side layui-bg-black">
         <div class="layui-side-scroll">
