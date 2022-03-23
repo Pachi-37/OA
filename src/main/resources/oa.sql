@@ -11,7 +11,7 @@
  Target Server Version : 50728
  File Encoding         : 65001
 
- Date: 21/03/2022 09:20:48
+ Date: 23/03/2022 11:06:58
 */
 
 SET NAMES utf8mb4;
@@ -155,21 +155,22 @@ CREATE TABLE `sys_user`  (
   `username` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `password` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `employee_id` bigint(20) NOT NULL,
+  `salt` int(11) NOT NULL,
   PRIMARY KEY (`user_id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 'm8', 'test', 1);
-INSERT INTO `sys_user` VALUES (2, 't7', 'test', 2);
-INSERT INTO `sys_user` VALUES (3, 't6', 'test', 3);
-INSERT INTO `sys_user` VALUES (4, 't5', 'test', 4);
-INSERT INTO `sys_user` VALUES (5, 't4', 'test', 5);
-INSERT INTO `sys_user` VALUES (6, 's7', 'test', 6);
-INSERT INTO `sys_user` VALUES (7, 's6', 'test', 7);
-INSERT INTO `sys_user` VALUES (8, 's5', 'test', 8);
-INSERT INTO `sys_user` VALUES (9, 's4', 'test', 9);
-INSERT INTO `sys_user` VALUES (10, 's3', 'test', 10);
+INSERT INTO `sys_user` VALUES (1, 'm8', '4d50012faaad5f130d4cd180266a0eec', 1, 171);
+INSERT INTO `sys_user` VALUES (2, 't7', 'f5ca0f241fce54eb545905fa7f4a1d01', 2, 172);
+INSERT INTO `sys_user` VALUES (3, 't6', '71ac13dff9d411a70ce917cf7abe8357', 3, 177);
+INSERT INTO `sys_user` VALUES (4, 't5', '526ed0a2d79f95e50e1589936d3d91da', 4, 178);
+INSERT INTO `sys_user` VALUES (5, 't4', '1d0c671f5b515ec4ff0b0d6ba954f206', 5, 179);
+INSERT INTO `sys_user` VALUES (6, 's7', 'b1ea83100514cb02b365f3a80a14ead4', 6, 180);
+INSERT INTO `sys_user` VALUES (7, 's6', 'cdc4e2723c762749d14d627a4b77306a', 7, 181);
+INSERT INTO `sys_user` VALUES (8, 's5', '868816a5f21d00bef493e895824a4f51', 8, 182);
+INSERT INTO `sys_user` VALUES (9, 's4', '713c2c9be62332b9ff9abbf4eb62e26d', 9, 183);
+INSERT INTO `sys_user` VALUES (10, 's3', 'c671ea0b7bd6f440e765d99cc0f699aa', 10, 184);
 
 SET FOREIGN_KEY_CHECKS = 1;
