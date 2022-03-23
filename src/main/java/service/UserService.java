@@ -5,6 +5,7 @@ import dao.UserDao;
 import entity.Node;
 import entity.User;
 import service.exception.BusinessException;
+import utils.MD5Utils;
 
 import java.util.List;
 
@@ -22,7 +23,8 @@ public class UserService {
             throw new BusinessException("L001", "用户名不存在");
         }
 
-        if (password.equals(user.getPassword())) {
+        String md5 = MD5Utils.md5Digest(password, user.getSalt());
+        if (md5.equals(user.getPassword())) {
             return user;
         } else {
             throw new BusinessException("L002", "密码错误");
