@@ -79,3 +79,6 @@ String md5 = DigestUtils.md5Hex(String source);
    1. 7 级以下员工，生成部门经理审批任务，请假时间如果大于36小时，生成总经理审批任务
    2. 7 级员工，生成总经理审批任务
    3. 8 级员工，生成总经理审批任务，系统自动通过
+
+##### `sweetalter`
+类似于 `layui`，用来替代 `javaScript` 弹出框
