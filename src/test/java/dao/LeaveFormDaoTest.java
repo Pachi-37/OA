@@ -8,6 +8,8 @@ import javax.xml.crypto.Data;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -39,6 +41,17 @@ public class LeaveFormDaoTest {
             form.setState("processing");
             leaveFormDao.insert(form);
             return null;
+        });
+    }
+
+    @Test
+    public void selectByParams() {
+
+        MybatisUtils.executeQuery(sqlSession -> {
+            LeaveFormDao leaveFormDao = sqlSession.getMapper(LeaveFormDao.class);
+            List<Map> list = leaveFormDao.selectByParams("process", 2l);
+            System.out.println(list);
+            return list;
         });
     }
 }

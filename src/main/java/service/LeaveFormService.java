@@ -6,9 +6,13 @@ import dao.ProcessFlowDao;
 import entity.Employee;
 import entity.LeaveForm;
 import entity.ProcessFlow;
+import service.exception.BusinessException;
 import utils.MybatisUtils;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class LeaveFormService {
 
@@ -116,4 +120,75 @@ public class LeaveFormService {
         return savedForm;
     }
 
+    public List<Map> getLeaveFormList(String pfState, Long operatorId) {
+        return (List<Map>) MybatisUtils.executeQuery(sqlSession -> {
+            LeaveFormDao leaveFormDao = sqlSession.getMapper(LeaveFormDao.class);
+            List<Map> list = leaveFormDao.selectByParams(pfState, operatorId);
+            return list;
+        });
+    }
+
+    /**
+     * 请假审核
+     *
+     * @param formId     表单编号
+     * @param operatorId 经办人编号
+     * @param result     审批结果
+     * @param reason     审批原因
+     */
+    public void audit(Long formId, Long operatorId, String result, String reason) {
+        MybatisUtils.executeUpdate(sqlSession -> {
+            ProcessFlowDao processFlowDao = sqlSession.getMapper(ProcessFlowDao.class);
+            List<ProcessFlow> processFlowList = processFlowDao.selectByFormId(formId);
+
+            if (processFlowList.size() == 0) {
+                throw new BusinessException("PF001", "无效审批流程");
+            }
+
+            // 过滤得到当前任务对象
+            List<ProcessFlow> list = processFlowList.stream().filter(processFlow -> processFlow.getOperatorId() == operatorId && processFlow.getState().equals("process")).collect(Collectors.toList());
+            ProcessFlow flow = null;
+            if (list.size() == 0) {
+                throw new BusinessException("PF002", "无待处理审批任务");
+            } else {
+                flow = list.get(0);
+                flow.setState("complete");
+                flow.setResult(result);
+                flow.setReason(reason);
+                flow.setAuditTime(new Date());
+
+                processFlowDao.update(flow);
+
+            }
+
+            LeaveFormDao leaveFormDao = sqlSession.getMapper(LeaveFormDao.class);
+            LeaveForm form = leaveFormDao.selectById(formId);
+            // 判断当前任务是否为最后一个节点
+            if (flow.getIsLast() == 1) {
+                form.setState(result);
+                leaveFormDao.update(form);
+            } else {
+
+                // 取出后续节点
+                List<ProcessFlow> flows = processFlowList.stream().filter(processFlow -> processFlow.getState().equals("ready")).collect(Collectors.toList());
+
+                // 当前节点审批驳回
+                if (result.equals("refused")) {
+                    form.setState(result);
+                    leaveFormDao.update(form);
+
+                    for (ProcessFlow p : flows) {
+                        p.setState("cancel");
+                        processFlowDao.update(p);
+                    }
+                } else if (result.equals("approved")) {
+                    ProcessFlow readyFlow = flows.get(0);
+                    readyFlow.setState("process");
+                    processFlowDao.update(readyFlow);
+                }
+            }
+
+            return null;
+        });
+    }
 }

@@ -29,4 +29,10 @@ public class LeaveFormServiceTest {
 
         System.out.println(saveForm.getFormId());
     }
+
+    @Test
+    public void audit() {
+        leaveFormService.audit(8l,2l,"approved","早日回来");
+        leaveFormService.audit(8l,1l,"approved","早日回来");
+    }
 }

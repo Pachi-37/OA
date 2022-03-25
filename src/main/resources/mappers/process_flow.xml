@@ -4,8 +4,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="dao.ProcessFlowDao">
-    <select id="selectById" parameterType="Long" resultType="entity.ProcessFlow">
-        select * from adm_process_flow where process_id = #{value}
+    <select id="selectByFormId" parameterType="Long" resultType="entity.ProcessFlow">
+        select * from adm_process_flow where form_id = #{value} order by order_no
     </select>
 
     <insert id="insert" parameterType="entity.ProcessFlow"
@@ -13,4 +13,9 @@
         insert into adm_process_flow (form_id, operator_id, action, result, reason, create_time, audit_time, order_no, state, is_last)
         values (#{formId}, #{operatorId}, #{action}, #{result}, #{reason}, #{createTime}, #{auditTime}, #{orderNo}, #{state}, #{isLast})
     </insert>
+
+    <update id="update" parameterType="entity.ProcessFlow">
+        update adm_process_flow set form_id = #{formId}, operator_id = #{operatorId}, action = #{action}, result = #{result}, reason = #{reason}, create_time = #{createTime}, audit_time = #{auditTime}, order_no = #{orderNo}, state = #{state}, is_last = #{isLast}
+        where process_id = #{processId}
+    </update>
 </mapper>

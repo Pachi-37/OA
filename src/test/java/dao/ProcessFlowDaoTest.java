@@ -32,4 +32,14 @@ public class ProcessFlowDaoTest {
             return null;
         });
     }
+
+    @Test
+    public void selectByFormId() {
+        MybatisUtils.executeQuery(sqlSession -> {
+            ProcessFlowDao processFlowDao = sqlSession.getMapper(ProcessFlowDao.class);
+            processFlowDao.selectByFormId(3l);
+
+            return null;
+        });
+    }
 }
