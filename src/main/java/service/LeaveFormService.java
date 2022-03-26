@@ -94,7 +94,7 @@ public class LeaveFormService {
 
                     noticeContent = String.format("%s-%s提出请假申请[%s-%s],请尽快处理。", employee.getTitle(), employee.getName(), sdf.format(form.getStartTime()), sdf.format(form.getEndTime()));
 
-                    noticeDao.insert(new Notice(manager.getEmployeeId(), noticeContent));
+                    noticeDao.insert(new Notice(dmanager.getEmployeeId(), noticeContent));
                 } else {
                     flow2.setIsLast(1);
 
