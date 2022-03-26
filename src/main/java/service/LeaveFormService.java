@@ -2,13 +2,16 @@ package service;
 
 import dao.EmployeeDao;
 import dao.LeaveFormDao;
+import dao.NoticeDao;
 import dao.ProcessFlowDao;
 import entity.Employee;
 import entity.LeaveForm;
+import entity.Notice;
 import entity.ProcessFlow;
 import service.exception.BusinessException;
 import utils.MybatisUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +55,13 @@ public class LeaveFormService {
             flow1.setIsLast(0);
             processFlowDao.insert(flow1);
 
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH时");
+            String noticeContent = String.format("您的请假申请[%s-%s]已经提交，等待上级批准", sdf.format(form.getStartTime()), sdf.format(form.getEndTime()));
+
+            NoticeDao noticeDao = sqlSession.getMapper(NoticeDao.class);
+
+            noticeDao.insert(new Notice(employee.getEmployeeId(), noticeContent));
+
             // 分情况创建其余流程数据
             if (employee.getLevel() < 7) {
                 Employee dmanager = employeeDao.selectLeader(employee);
@@ -81,10 +91,18 @@ public class LeaveFormService {
                     flow3.setIsLast(1);
 
                     processFlowDao.insert(flow3);
+
+                    noticeContent = String.format("%s-%s提出请假申请[%s-%s],请尽快处理。", employee.getTitle(), employee.getName(), sdf.format(form.getStartTime()), sdf.format(form.getEndTime()));
+
+                    noticeDao.insert(new Notice(manager.getEmployeeId(), noticeContent));
                 } else {
                     flow2.setIsLast(1);
 
                     processFlowDao.insert(flow2);
+
+                    noticeContent = String.format("%s-%s提出请假申请[%s-%s],请尽快处理。", employee.getTitle(), employee.getName(), sdf.format(form.getStartTime()), sdf.format(form.getEndTime()));
+
+                    noticeDao.insert(new Notice(dmanager.getEmployeeId(), noticeContent));
                 }
             } else if (employee.getLevel() == 7) {
                 // 7级员工,生成总经理审批任务
@@ -99,6 +117,10 @@ public class LeaveFormService {
                 flow.setIsLast(1);
 
                 processFlowDao.insert(flow);
+
+                noticeContent = String.format("%s-%s提出请假申请[%s-%s],请尽快处理。", employee.getTitle(), employee.getName(), sdf.format(form.getStartTime()), sdf.format(form.getEndTime()));
+
+                noticeDao.insert(new Notice(manager.getEmployeeId(), noticeContent));
             } else if (employee.getLevel() == 8) {
                 // 8级员工,生成总经理审批任务,系统自动通过
                 ProcessFlow flow = new ProcessFlow();
@@ -114,6 +136,9 @@ public class LeaveFormService {
                 flow.setIsLast(1);
 
                 processFlowDao.insert(flow);
+
+                noticeContent = String.format("您提出请假申请[%s-%s]已经自动通过", sdf.format(form.getStartTime()), sdf.format(form.getEndTime()));
+                noticeDao.insert(new Notice(employee.getEmployeeId(), noticeContent));
             }
             return form;
         });
@@ -148,6 +173,10 @@ public class LeaveFormService {
             // 过滤得到当前任务对象
             List<ProcessFlow> list = processFlowList.stream().filter(processFlow -> processFlow.getOperatorId() == operatorId && processFlow.getState().equals("process")).collect(Collectors.toList());
             ProcessFlow flow = null;
+            String noticeContent = null;
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-H时");
+            NoticeDao noticeDao = sqlSession.getMapper(NoticeDao.class);
+
             if (list.size() == 0) {
                 throw new BusinessException("PF002", "无待处理审批任务");
             } else {
@@ -163,10 +192,28 @@ public class LeaveFormService {
 
             LeaveFormDao leaveFormDao = sqlSession.getMapper(LeaveFormDao.class);
             LeaveForm form = leaveFormDao.selectById(formId);
+            Employee employee = sqlSession.getMapper(EmployeeDao.class).selectById(form.getEmployeeId());
+            Employee operator = sqlSession.getMapper(EmployeeDao.class).selectLeader(employee);
+
             // 判断当前任务是否为最后一个节点
             if (flow.getIsLast() == 1) {
                 form.setState(result);
                 leaveFormDao.update(form);
+
+                String res = null;
+                if (result.equals("refused")) {
+                    res = "驳回";
+                } else if (result.equals("approved")) {
+                    res = "通过";
+                }
+
+                noticeContent = String.format("您提交的[%s-%s]请假申请%s-%s已经%s,审批意见%s", sdf.format(form.getStartTime()), sdf.format(form.getEndTime()), operator.getTitle(), operator.getName(), res, reason);
+
+                noticeDao.insert(new Notice(form.getEmployeeId(), noticeContent));
+
+                noticeContent = String.format("%s-%s发起的请假申请[%s-%s]您已经%s,审批意见%s,审批结束", employee.getTitle(), employee.getName(), sdf.format(form.getStartTime()), sdf.format(form.getEndTime()), res, reason);
+
+                noticeDao.insert(new Notice(operator.getEmployeeId(), noticeContent));
             } else {
 
                 // 取出后续节点
@@ -181,10 +228,38 @@ public class LeaveFormService {
                         p.setState("cancel");
                         processFlowDao.update(p);
                     }
+
+                    // 通知申请人表单已被驳回
+                    String noticeContent1 = String.format("您的请假申请[%s-%s]%s%s已驳回,审批意见:%s,审批流程已结束" ,
+                            sdf.format(form.getStartTime()) , sdf.format(form.getEndTime()),
+                            operator.getTitle() , operator.getName(),reason);
+                    noticeDao.insert(new Notice(form.getEmployeeId(),noticeContent1));
+
+                    // 通知经办人表单"您已驳回"
+                    String noticeContent2 = String.format("%s-%s提起请假申请[%s-%s]您已驳回,审批意见:%s,审批流程已结束" ,
+                            employee.getTitle() , employee.getName() , sdf.format( form.getStartTime()) , sdf.format(form.getEndTime()), reason);
+                    noticeDao.insert(new Notice(operator.getEmployeeId(),noticeContent2));
+
                 } else if (result.equals("approved")) {
                     ProcessFlow readyFlow = flows.get(0);
                     readyFlow.setState("process");
                     processFlowDao.update(readyFlow);
+
+                    // 通知表单提交人,部门经理已经审批通过,交由上级继续审批
+                    String noticeContent1 = String.format("您的请假申请[%s-%s]%s%s已批准,审批意见:%s ,请继续等待上级审批" ,
+                            sdf.format(form.getStartTime()) , sdf.format(form.getEndTime()),
+                            operator.getTitle() , operator.getName(),reason);
+                    noticeDao.insert(new Notice(form.getEmployeeId(),noticeContent1));
+
+                    // 通知总经理有新的审批任务
+                    String noticeContent2 = String.format("%s-%s提起请假申请[%s-%s],请尽快审批" ,
+                            employee.getTitle() , employee.getName() , sdf.format( form.getStartTime()) , sdf.format(form.getEndTime()));
+                    noticeDao.insert(new Notice(readyFlow.getOperatorId(),noticeContent2));
+
+                    // 通知部门经理(当前经办人),员工的申请单你已批准,交由上级继续审批
+                    String noticeContent3 = String.format("%s-%s提起请假申请[%s-%s]您已批准,审批意见:%s,申请转至上级领导继续审批" ,
+                            employee.getTitle() , employee.getName() , sdf.format( form.getStartTime()) , sdf.format(form.getEndTime()), reason);
+                    noticeDao.insert(new Notice(operator.getEmployeeId(),noticeContent3));
                 }
             }
 
