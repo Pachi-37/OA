@@ -91,3 +91,55 @@ String md5 = DigestUtils.md5Hex(String source);
    * 未超过规定时间，申请驳回
    * 超过规定时间，总经理审批任务取消
 > 按中间节点审批状态和最后节点审批状态分类
+
+
+
+### 项目部署
+
+安装两台 `Centos7` `Centos-DB` `Centos-WEB`
+
+
+
+##### 安装 `mysql 8`
+
+- 使用 `wget` 下载 `mysql` 安装包
+- 本地安装源 `yum localinstall -y *.rpm`
+- 安装 `Mysql` `yum install -y mysql-community-server`
+
+
+
+##### 初始化 `mysql`
+
+- 设置密码
+
+  - `vi /var/log/mysqld.log`
+    - 查看默认生成密码
+  - `alter user 'root'@'localhost' identified with mysql_native_password by '[password]'`
+
+  > `with mysql_native_password` 考虑到兼容早期版本
+
+- 设置允许远程登录
+
+  - `update user set host='%' where user='root'`
+  - `flush priviledges`
+
+- 放行防火墙
+
+  - `firewall-cmd --zone=public --permanent --add-port=3306/tcp`
+  - `firewall-cmd --zone=public --permanent --add-rich-rule="rule family="ipv4" source address="[ip]" port protocol="tcp" port="3306" accept "`
+    - 设置防火墙对指定 `ip` 指定端口放行
+
+
+
+##### 配置 `centos-web`
+
+- 配置 `java` 环境
+- 安装 `Tomcat`
+- 解压项目 `.war`
+- 更改项目配置文件 `Mybatis-config.xml`
+- 配置 `Tomcat/conf/server.xml`
+  - 更改端口 `80`
+  - 配置默认的项目
+    - `<Context path="/" docBase="[项目地址]">`
+  - 启动 `Tomcat`
+  - 暴露 `80` 端口
