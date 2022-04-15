@@ -29,9 +29,11 @@ public class IndexServlet extends HttpServlet {
         Employee employee = employeeService.selectById(user.getEmployeeId());
         Department department = departmentService.selectById(employee.getDepartmentId());
         List<Node> nodeList = userService.selectNodeByUserId(user.getUserId());
+        List<Department> departmentList = departmentService.selectAllDepartments();
 
         session.setAttribute("current_employee", employee);
         session.setAttribute("current_department", department);
+        session.setAttribute("all_departments",departmentList);
 
         request.setAttribute("node_list", nodeList);
         request.getRequestDispatcher("/index.ftl").forward(request, response);

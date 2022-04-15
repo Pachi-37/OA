@@ -18,4 +18,8 @@ public class UserDao {
         User user = (User) MybatisUtils.executeQuery(sqlSession -> sqlSession.selectOne("usermapper.selectByUsername", username));
         return user;
     }
+
+    public void insertUser(User user) {
+        MybatisUtils.executeUpdate(sqlSession -> sqlSession.insert("usermapper.insertUser", user));
+    }
 }

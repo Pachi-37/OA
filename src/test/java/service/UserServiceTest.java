@@ -19,4 +19,15 @@ public class UserServiceTest {
     public void selectNodeByUserId() {
         userService.selectNodeByUserId(21L).stream().forEach(s -> System.out.println(s));
     }
+
+    @Test
+    public void onboarding() {
+        User user = new User();
+        user.setUserName("test");
+        user.setSalt(1);
+        user.setPassword("weq");
+        user.setEmployeeId(1l);
+
+        userService.onboarding(user);
+    }
 }

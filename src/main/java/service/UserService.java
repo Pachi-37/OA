@@ -34,4 +34,8 @@ public class UserService {
     public List<Node> selectNodeByUserId(Long userId) {
         return rbacDao.selectNodeByUserId(userId);
     }
+
+    public void onboarding(User user) {
+        userDao.insertUser(user);
+    }
 }

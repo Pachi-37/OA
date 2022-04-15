@@ -5,7 +5,9 @@
 <!-- id 名和方法名对应，parameterType 对应参数类型 resultType 对应返回值类型 -->
 <mapper namespace="dao.EmployeeDao">
     <select id="selectById" parameterType="Long" resultType="entity.Employee">
-        select * from adm_employee where employee_id = #{value}
+        select *
+        from adm_employee
+        where employee_id = #{value}
     </select>
 
     <select id="selectLeader" parameterType="entity.Employee" resultType="entity.Employee">
@@ -23,4 +25,9 @@
             </if>
         </where>
     </select>
+
+    <insert id="insertEmployee" parameterType="entity.Employee" useGeneratedKeys="true" keyProperty="employeeId" keyColumn="employee_id">
+        insert into adm_employee (name, department_id, title ,level) values (#{name}, #{departmentId}, #{title},
+        #{level})
+    </insert>
 </mapper>

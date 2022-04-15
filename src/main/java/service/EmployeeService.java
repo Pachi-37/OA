@@ -13,4 +13,11 @@ public class EmployeeService {
             return employeeDao.selectById(employeeId);
         });
     }
+
+    public void onboarding(Employee employee) {
+        MybatisUtils.executeUpdate(sqlSession -> {
+            sqlSession.getMapper(EmployeeDao.class).insertEmployee(employee);
+            return null;
+        });
+    }
 }

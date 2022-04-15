@@ -13,4 +13,6 @@ public interface EmployeeDao {
      * @return 上级主管对象
      */
     public Employee selectLeader(@Param("emp") Employee employee);
+
+    public void insertEmployee(Employee employee);
 }

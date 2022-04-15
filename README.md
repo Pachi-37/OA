@@ -143,3 +143,14 @@ String md5 = DigestUtils.md5Hex(String source);
     - `<Context path="/" docBase="[项目地址]">`
   - 启动 `Tomcat`
   - 暴露 `80` 端口
+
+#更新部分
+1. 行政管理
+   1. 员工入职
+   
+
+### 行政管理
+
+##### 员工入职
+- 总经理有权给任意部门新添员工
+- 部门经理只有权为自己部门添加员工

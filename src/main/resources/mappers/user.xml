@@ -6,4 +6,8 @@
     <select id="selectByUsername" resultType="entity.User">
         select * from sys_user where username = #{value}
     </select>
+
+    <insert id="insertUser" parameterType="entity.User" useGeneratedKeys="true" keyColumn="user_id" keyProperty="userId">
+        insert into sys_user (username, password, employee_id, salt) values (#{userName}, #{password}, #{employeeId}, #{salt})
+    </insert>
 </mapper>

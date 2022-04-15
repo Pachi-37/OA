@@ -7,4 +7,11 @@
         select * from adm_department where department_id = #{value}
     </select>
 
+    <select id="selectAllDepartments" resultType="entity.Department">
+        select * from adm_department
+    </select>
+
+    <select id="selectByDepartmentName" parameterType="String" resultType="entity.Department">
+        select * from adm_department where department_name = #{value}
+    </select>
 </mapper>
