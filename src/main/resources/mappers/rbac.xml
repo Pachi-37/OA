@@ -13,4 +13,8 @@
           and n.node_id = rn.node_id
         order by n.node_code
     </select>
+
+    <insert id="onboarding" parameterType="entity.RoleUser" useGeneratedKeys="true" keyProperty="rnId">
+        insert into sys_role_user (role_id, user_id) values (#{roleId}, #{userId})
+    </insert>
 </mapper>

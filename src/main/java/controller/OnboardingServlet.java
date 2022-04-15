@@ -1,9 +1,10 @@
 package controller;
 
 import com.alibaba.fastjson.JSON;
-import dao.DepartmentDao;
+import dao.RbacDao;
 import entity.Department;
 import entity.Employee;
+import entity.RoleUser;
 import entity.User;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ public class OnboardingServlet extends HttpServlet {
     private DepartmentService departmentService = new DepartmentService();
     private EmployeeService employeeService = new EmployeeService();
     private UserService userService = new UserService();
+    private RbacDao rbacDao = new RbacDao();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -54,6 +56,7 @@ public class OnboardingServlet extends HttpServlet {
         Department onboardDepartment = departmentService.selectByDepartmentName(department);
         Employee employee = new Employee();
         User user = new User();
+        RoleUser roleUser = new RoleUser();
         Map result = new HashMap();
         try {
             employee.setName(name);
@@ -72,12 +75,20 @@ public class OnboardingServlet extends HttpServlet {
             userService.onboarding(user);
 
 
+            if (Integer.parseInt(level) >= 7) {
+                roleUser.setRoleId(2l);
+            } else {
+                roleUser.setRoleId(1l);
+            }
+            roleUser.setUserId(user.getUserId());
+            rbacDao.onboarding(roleUser);
+
             result.put("code", "0");
             result.put("message", "success");
         } catch (Exception e) {
             logger.error("员工入职异常", e);
-            result.put("code",e.getClass().getName());
-            result.put("message",e.getMessage());
+            result.put("code", e.getClass().getName());
+            result.put("message", e.getMessage());
         } finally {
             String json = JSON.toJSONString(result);
             response.getWriter().println(json);
